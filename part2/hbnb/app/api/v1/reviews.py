@@ -1,6 +1,5 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask import request, jsonify
 
 api = Namespace('reviews', description='Review operations')
 
@@ -23,6 +22,11 @@ class ReviewList(Resource):
 
         try:
             place = facade.get_place(review_data['place_id'])
+            id_user = review_data['user_id']
+
+            if place.owner_id == id_user:
+                return {'error': 'Cannot add a review for your own place'}, 400
+
             new_review = facade.create_review(review_data)
             place.add_review(new_review)
         except Exception as e:
@@ -55,14 +59,18 @@ class ReviewResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, review_id):
         """Update a review's information"""
-        review_data = request.get_json()
-        if "owner" in review_data.keys() or "owner_id" in review_data.keys():
-            return {'error': 'Invalid input data'}, 400
+        review_data = api.payload
 
         review = facade.get_review(review_id)
 
         if not review:
             return {'error': 'Review not found'}, 404
+
+        id_user = review_data['user_id']
+        place = facade.get_place(review_data['place_id'])
+
+        if id_user != review.user_id or place.owner_id == id_user:
+            return {'error': 'Invalid input data'}, 400
 
         facade.update_review(review_id, review_data)
 

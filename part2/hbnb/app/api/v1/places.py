@@ -1,6 +1,5 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask import request
 
 api = Namespace('places', description='Place operations')
 
@@ -78,8 +77,17 @@ class PlaceResource(Resource):
         if not place:
             return {'error': 'Place not found'}, 404
         user = facade.get_user(place.owner_id)
-        return {'id': place.id, 'title': place.title, 'description': place.description, 'price': place.price, 
-                'latitude': place.latitude, 'longitude': place.longitude, 'owner': user.to_dict(), 'amenities': place.amenities, 'reviews': place.reviews}, 200
+        return {
+            'id': place.id, 
+            'title': place.title, 
+            'description': place.description, 
+            'price': place.price, 
+            'latitude': place.latitude, 
+            'longitude': place.longitude, 
+            'owner': user.to_dict(), 
+            'amenities': place.amenities, 
+            'reviews': [review.to_dict() for review in place.reviews]
+        }, 200
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -87,8 +95,8 @@ class PlaceResource(Resource):
     @api.response(400, 'Invalid input data')
     def put(self, place_id):
         """Update a place's information"""
-        place_data = request.get_json()
-        if "owner" in place_data.keys() or "owner_id" in place_data.keys():
+        place_data = api.payload
+        if "owner" in place_data.keys() or "owner_id" in place_data.keys() or "reviews" in place_data.keys():
             return {'error': 'Invalid input data'}, 400
 
         place = facade.get_place(place_id)

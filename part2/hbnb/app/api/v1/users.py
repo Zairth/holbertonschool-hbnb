@@ -1,6 +1,5 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask import request
 
 api = Namespace('users', description='User operations')
 
@@ -57,7 +56,7 @@ class UserResource(Resource):
     @api.response(400, 'Input data invalid')
     def put(self, user_id):
         """Update a specific user"""
-        user_data = request.get_json()
+        user_data = api.payload
         user = facade.get_user(user_id)
 
         if not user:
