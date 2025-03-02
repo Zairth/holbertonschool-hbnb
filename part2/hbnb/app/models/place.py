@@ -18,6 +18,10 @@ class Place(BaseModel):
         """Add a review to the place."""
         self.reviews.append(review)
 
+    def remove_review(self, review):
+        """Remove a review from the list reviews"""
+        self.reviews.remove(review)
+
     def add_amenity(self, amenity):
         """Add an amenity to the place."""
         self.amenities.append(amenity)

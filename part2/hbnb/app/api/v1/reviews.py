@@ -22,6 +22,9 @@ class ReviewList(Resource):
 
         try:
             place = facade.get_place(review_data['place_id'])
+            if not place:
+                return {"error": "Cannot add a review for a non-existant place"}, 404
+
             id_user = review_data['user_id']
 
             if place.owner_id == id_user:
@@ -66,11 +69,14 @@ class ReviewResource(Resource):
         if not review:
             return {'error': 'Review not found'}, 404
 
-        id_user = review_data['user_id']
-        place = facade.get_place(review_data['place_id'])
+        place = facade.get_place(review.place_id)
+        if not place:
+            return {"error": "Place not found"}, 404
+        if place.id != review_data['place_id']:
+            return {"error": "Wrong place_id input"}, 404
 
-        if id_user != review.user_id or place.owner_id == id_user:
-            return {'error': 'Invalid input data'}, 400
+        if review_data['user_id'] != review.user_id:
+            return {'error': 'Cannot update review that is not yours'}, 400
 
         facade.update_review(review_id, review_data)
 
@@ -81,13 +87,14 @@ class ReviewResource(Resource):
     def delete(self, review_id):
 
         review = facade.get_review(review_id)
-
         if not review:
             return{'error': 'Review not found'}, 404
-        
+
+        place = facade.get_place(review.place_id)
+        place.remove_review(review)
         facade.delete_review(review_id)
 
-        return{"message": "Review delete"}, 200
+        return{"message": "Review deleted"}, 200
         
 
 @api.route('/places/<place_id>/reviews')
