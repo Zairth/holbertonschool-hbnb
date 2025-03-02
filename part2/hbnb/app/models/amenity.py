@@ -10,3 +10,9 @@ class Amenity(BaseModel):
             raise ValueError("Too many characters")
         super().__init__()
         self.name = name
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }

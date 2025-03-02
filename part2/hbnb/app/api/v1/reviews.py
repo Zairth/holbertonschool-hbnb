@@ -23,7 +23,7 @@ class ReviewList(Resource):
         try:
             place = facade.get_place(review_data['place_id'])
             if not place:
-                return {"error": "Cannot add a review for a non-existant place"}, 404
+                return {"error": "Place not found, cannot add review"}, 404
 
             id_user = review_data['user_id']
 

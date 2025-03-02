@@ -38,6 +38,9 @@ class PlaceList(Resource):
         """Register a new place"""
         place_data = api.payload
 
+        if "reviews" in place_data.keys():
+            return {"error": "Cannot create a place with a review"}, 400
+
         new_place = facade.create_place(place_data)
 
         if "amenities" in place_data:
@@ -76,7 +79,9 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
+
         user = facade.get_user(place.owner_id)
+
         return {
             'id': place.id, 
             'title': place.title, 
@@ -84,8 +89,8 @@ class PlaceResource(Resource):
             'price': place.price, 
             'latitude': place.latitude, 
             'longitude': place.longitude, 
-            'owner': user.to_dict(), 
-            'amenities': place.amenities, 
+            'owner': user.to_dict(),
+            'amenities': [facade.get_amenity(amenity['id']).to_dict() for amenity in place.amenities],
             'reviews': [review.to_dict() for review in place.reviews]
         }, 200
 
@@ -97,12 +102,12 @@ class PlaceResource(Resource):
         """Update a place's information"""
         place_data = api.payload
         if "owner" in place_data.keys() or "owner_id" in place_data.keys() or "reviews" in place_data.keys():
-            return {'error': 'Invalid input data'}, 400
+            return {'error': 'Invalid input data, forbidden access'}, 400
 
         place = facade.get_place(place_id)
         if not place:
             return {'error': 'Place not found'}, 404
 
-        updated_place = facade.update_place(place.id, place_data)
+        facade.update_place(place.id, place_data)
 
         return {"message": "Place updated successfully"}, 200
