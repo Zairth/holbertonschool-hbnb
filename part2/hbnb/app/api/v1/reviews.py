@@ -43,7 +43,7 @@ class ReviewList(Resource):
         reviews = facade.get_all_reviews()
         if not reviews:
             return {'error': 'No review found'}
-        return [{'text': review.text, 'rating': review.rating, 'user_id': review.user_id, 'place_id': review.place_id} for review in reviews], 200
+        return [{'id': review.id, 'text': review.text, 'rating': review.rating} for review in reviews], 200
 
 @api.route('/<review_id>')
 class ReviewResource(Resource):
@@ -54,7 +54,7 @@ class ReviewResource(Resource):
         review = facade.get_review(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
-        return {'id': review.id, 'text': review.text, 'rating': review.rating}, 200
+        return {'id': review.id, 'text': review.text, 'rating': review.rating, 'user_id': review.user_id, 'place_id': review.place_id}, 200
 
     @api.expect(review_model)
     @api.response(200, 'Review updated successfully')
@@ -63,6 +63,9 @@ class ReviewResource(Resource):
     def put(self, review_id):
         """Update a review's information"""
         review_data = api.payload
+
+        if "id" in review_data.keys():
+            return {"error": "Cannot update the ID of the Review"}, 400
 
         review = facade.get_review(review_id)
 
@@ -109,4 +112,4 @@ class PlaceReviewList(Resource):
         reviews = place.reviews
         if not reviews:
             return {'error': 'No reviews existant'}
-        return [{'text': review.text, 'rating': review.rating, 'user_id': review.user_id, 'place_id': review.place_id} for review in reviews], 200
+        return [{'id': review.id, 'text': review.text, 'rating': review.rating} for review in reviews], 200

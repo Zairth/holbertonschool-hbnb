@@ -34,6 +34,7 @@ class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @api.response(404, 'Amenity not found')
     def post(self):
         """Register a new place"""
         place_data = api.payload
@@ -50,6 +51,8 @@ class PlaceList(Resource):
                 amenity = facade.get_amenity(amenity_id)
                 if amenity:
                     amenities.append({'id': amenity.id, 'name': amenity.name})
+                else:
+                    return {"error": "Amenity not found"}, 404
             new_place.amenities = amenities
 
         return {
