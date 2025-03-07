@@ -20,6 +20,9 @@ class AmenityList(Resource):
         if not amenity_datas:
             return {'error': 'Invalid input data'}, 400
 
+        if len(amenity_datas['name']) <= 0:
+            return {'error': 'Name can\'t be empty'}, 400
+
         new_amenity = facade.create_amenity(amenity_datas)
 
         return {"id": new_amenity.id, "name": new_amenity.name}, 201
@@ -28,7 +31,7 @@ class AmenityList(Resource):
     def get(self):
         """Retrieve a list of all amenities"""
         amenities_list = facade.get_all_amenities()
-        return [{"id": amenity.id, "name": amenity.name} for amenity in amenities_list], 201
+        return [{"id": amenity.id, "name": amenity.name} for amenity in amenities_list], 200
 
 @api.route('/<amenity_id>')
 class AmenityResource(Resource):
@@ -39,7 +42,7 @@ class AmenityResource(Resource):
         amenity = facade.get_amenity(amenity_id)
         if not amenity:
             return {"error": "Amenity not found"}, 404
-        return {"id": amenity.id, "name": amenity.name}, 201
+        return {"id": amenity.id, "name": amenity.name}, 200
 
     @api.expect(amenity_model)
     @api.response(200, 'Amenity updated successfully')
@@ -54,6 +57,8 @@ class AmenityResource(Resource):
             return {"error": "Invalid input data"}, 400
         if not amenity:
             return {"error": "Amenity not found"}, 404
+        if len(data['name']) <= 0:
+            return {'error': 'Name can\'t be empty'}, 400
 
         new_amenity = facade.update_amenity(amenity_id, data)
 

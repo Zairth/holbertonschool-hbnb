@@ -20,6 +20,13 @@ class ReviewList(Resource):
         """Register a new review"""
         review_data = api.payload
 
+        if review_data['rating'] < 1 or review_data['rating'] > 5:
+            return {'error': 'Rating must be inside the range 1 - 5.'}, 400
+        if not "text" in review_data or len(review_data['text']) <= 0:
+            return {'error': 'Review\'s text required'}, 400
+        if not facade.get_user(review_data['user_id']):
+            return {"error": "User not found, cannot add review"}, 404
+
         try:
             place = facade.get_place(review_data['place_id'])
             if not place:
@@ -68,9 +75,13 @@ class ReviewResource(Resource):
             return {"error": "Cannot update the ID of the Review"}, 400
 
         review = facade.get_review(review_id)
-
         if not review:
             return {'error': 'Review not found'}, 404
+        
+        if review_data['rating'] < 1 or review_data['rating'] > 5:
+            return {'error': 'Rating must be inside the range 1 - 5.'}, 400
+        if not "text" in review_data or len(review_data['text']) <= 0:
+            return {'error': 'Review\'s text required'}, 400
 
         place = facade.get_place(review.place_id)
         if not place:

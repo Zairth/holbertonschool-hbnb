@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from .base_model import BaseModel
+from flask import abort
 
 
 class Place(BaseModel):
@@ -33,9 +34,9 @@ class Place(BaseModel):
     @price.setter
     def price(self, price):
         if not isinstance(price, float):
-            raise TypeError("Price must be a float")
-        if price < 0:
-            raise ValueError("Price must be > 0")
+            abort(400, description="Price must be a float")
+        if price <= 0:
+            abort(400, description="Price must be > 0")
         self.__price = price
 
     @property
@@ -45,9 +46,9 @@ class Place(BaseModel):
     @latitude.setter
     def latitude(self, latitude):
         if not isinstance(latitude, float):
-            raise TypeError("Latitude must be a float")
+            abort(400, description="Latitude must be a float")
         if latitude < -90 or latitude > 90:
-            raise ValueError("Latitude should be between -90 and 90.")
+            abort(400, description="Latitude can't be outside of the range -90 to 90")
         self.__latitude = latitude
 
     @property
@@ -57,7 +58,7 @@ class Place(BaseModel):
     @longitude.setter
     def longitude(self, longitude):
         if not isinstance(longitude, float):
-            raise TypeError("Longitude must be a float")
+            abort(400, description="Longitude must be a float")
         if longitude < -180 or longitude > 180:
-            raise ValueError("Longitude should be between -90 and 90.")
+            abort(400, description="Longitude can't be outside of the range -180 to 180")
         self.__longitude = longitude

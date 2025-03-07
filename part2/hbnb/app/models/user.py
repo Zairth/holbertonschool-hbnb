@@ -2,6 +2,7 @@
 import re
 import json
 from .base_model import BaseModel
+from flask import abort
 
 
 def validate_email(email):
@@ -29,9 +30,9 @@ class User(BaseModel):
     @email.setter
     def email(self, email):
         if not isinstance(email, str):
-            raise TypeError("Wrong Email Type !")
+            abort(400, description="Email must be a string")
         if not validate_email(email):
-            raise ValueError("Not correct format !")
+            abort(400, description="Invalid email format")
         else:
             self.__email = email
 
