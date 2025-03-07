@@ -48,6 +48,43 @@ The subdirectory `api/` contains endpoints of the API organized by version.
 ## Models/
 The subdirectory `models/` defines business classes representing the main entities (e.g: User, Place).
 
+
+## Business Logic
+The Business Logic layer implements the rules governing interactions between entities,
+It ensures the data valitation and maintaisn the logics that dictates how proceses the information.
+
+### User
+Represents a user,  storing attributes like: name, email.
+
+### Place
+Represents a location avaible for rent, including details like: price, description.
+
+### Review
+Represents a review left by an user about a place, containing a text and a rating.
+
+### Amenity
+Represents amenities that a place can offer (e.g: WI-FI, pool, gym)
+
+## Relation between entities:
+
+A User can own multiples Places
+
+A Place can have multiple Reviews each linked to a User
+
+A Place can be associated with multiple Amenitites
+
+### Why UUID is Used as an Identifier
+Each entity in the system use UUID for these reasons
+
+Global Uniqueness
+Ensures uniqueness across distributed systems.
+
+Security Considerations
+Avoids exposing the order of record creation.
+
+Scalability and Flexibility
+Makes the merge easier to databases and distribute data.
+
 ## Services/
 The subdirectory `services/` implements the facade pattern to manage the interaction between layers.
 
@@ -81,6 +118,12 @@ pip innstall -r requirments.txt
 ## Execute the application
 ```c
 python3 run.py
+```
+
+##Running Unit Tests
+To ensure the integrity of business logic, run unit tests with this command:
+```c
+python3 -m unittest discover -s tests
 ```
 
 ## Authors
